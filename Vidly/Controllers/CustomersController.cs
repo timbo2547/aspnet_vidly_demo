@@ -12,7 +12,7 @@ namespace Vidly.Controllers
     public class CustomersController : Controller
     {
 
-        private readonly ApplicationDbContext _context;
+        private ApplicationDbContext _context;
 
         public CustomersController()
         {
@@ -52,5 +52,23 @@ namespace Vidly.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult Create(Customer viewModel)
+        {
+            _context.Customers.Add(viewModel);
+            _context.SaveChanges();
+            return RedirectToAction("Index", "Customers");
+        }
+
+        public ActionResult New()
+        {
+            var membershipTypes = _context.MembershipTypes.ToList();
+            var viewModel = new NewCustomerViewModel
+            {
+                 MembershipTypes = membershipTypes
+            };
+
+            return View(viewModel);
+        }
     }
 }

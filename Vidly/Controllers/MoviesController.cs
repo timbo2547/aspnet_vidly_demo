@@ -5,26 +5,36 @@ using System.Web;
 using System.Web.Mvc;
 using Vidly.Models;
 using Vidly.ViewModels;
+using System.Data.Entity;
 
 namespace Vidly.Controllers
 {
     public class MoviesController : Controller
     {
+
+        private readonly ApplicationDbContext _context;
+
+        public MoviesController()
+        {
+            _context = new ApplicationDbContext();
+        }
+
         // GET: Movies
         public ActionResult Index()
         {
-            List<Movie> movies = new List<Movie>
-            {
-                new Movie { Id = 1, Name = "Shrek"},
-                new Movie { Id = 2, Name = "Ice Age"}
-            };
+            //List<Movie> movies = new List<Movie>
+            //{
+            //    new Movie { Id = 1, Name = "Shrek"},
+            //    new Movie { Id = 2, Name = "Ice Age"}
+            //};
 
-            IndexMovieViewModel viewModel = new IndexMovieViewModel
-            {
-                Movies = movies
-            };
+            //IndexMovieViewModel viewModel = new IndexMovieViewModel
+            //{
+            //    Movies = movies
+            //};
 
-            return View(viewModel);
+            var movies = _context.Movies.Include(x => x.Genre).ToList();
+            return View(movies);
         }
 
         public ActionResult Random()
@@ -53,29 +63,33 @@ namespace Vidly.Controllers
             return Content("id = " + id);
         }
 
+
+
+
         [Route("movies/details/{id}")]
         public ActionResult Details(int id)
         {
-            List<Movie> movies = new List<Movie>
-            {
-                new Movie { Id = 1, Name = "Shrek"},
-                new Movie { Id = 2, Name = "Ice Age"}
-            };
+            //List<Movie> movies = new List<Movie>
+            //{
+            //    new Movie { Id = 1, Name = "Shrek"},
+            //    new Movie { Id = 2, Name = "Ice Age"}
+            //};
 
-            var mQuery = (from m in movies
-                          where m.Id == id
-                          select m).FirstOrDefault();
+            var movie = _context.Movies.Include(c => c.Genre).SingleOrDefault(x => x.Id == id);
 
-            if (mQuery == null)
+            if (movie == null)
             {
                 return HttpNotFound();
 
             }
             else
             {
-                return View(mQuery);
+                return View(movie);
             }
         }
+
+
+
 
 
         //ASP.Net MVC Attribute Route Constraints
