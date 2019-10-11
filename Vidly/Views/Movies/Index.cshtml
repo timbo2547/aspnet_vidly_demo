@@ -1,0 +1,27 @@
+﻿@using Vidly.ViewModels
+@model IndexMovieViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*Movies/Index*@
+
+<h2>Movies</h2>
+
+@if (Model.Movies.Count == 0)
+{
+    <p>There are no movies...</p>
+}
+else
+{
+    foreach (var movie in Model.Movies)
+    {
+        <ul>
+            <li>
+                @Html.ActionLink(movie.Name, "Details", "Movies", new { id = movie.Id }, new { })
+            </li>
+        </ul>
+    }
+}
