@@ -11,7 +11,6 @@ namespace Vidly.Controllers
 {
     public class MoviesController : Controller
     {
-
         private ApplicationDbContext _context;
 
         public MoviesController()
@@ -57,12 +56,6 @@ namespace Vidly.Controllers
             return View(viewModel);
         }
 
-
-
-
-
-
-
         [Route("movies/details/{id}")]
         public ActionResult Details(int id)
         {
@@ -85,10 +78,19 @@ namespace Vidly.Controllers
             }
         }
 
-
         [HttpPost]
+        [ValidateAntiForgeryToken]//Used in conjunction with View Helper method AntiForgeryToken
         public ActionResult Save(Movie movie)
         {
+            if (!ModelState.IsValid)
+            {
+                var viewModel = new MovieFormViewModel(movie)
+                {
+                    Genres = _context.Genres.ToList()
+                };
+                return View("MovieForm", viewModel);
+            }
+
             if (movie.Id == 0) //Add
             {
                 movie.DateAdded = DateTime.Now;
@@ -123,9 +125,8 @@ namespace Vidly.Controllers
             }
             else
             {
-                var viewModel = new MovieFormViewModel
+                var viewModel = new MovieFormViewModel(movie)
                 {
-                    Movie = movie,
                     Genres = _context.Genres.ToList()
                 };
                 return View("MovieForm", viewModel);
@@ -135,7 +136,7 @@ namespace Vidly.Controllers
         public ActionResult New()
         {
             var genres = _context.Genres.ToList();
-            var viewModel = new MovieFormViewModel
+            var viewModel = new MovieFormViewModel()
             {
                 Genres = genres
             };

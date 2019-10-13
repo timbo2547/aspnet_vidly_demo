@@ -53,6 +53,7 @@ namespace Vidly.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]//Used in conjunction with View Helper method AntiForgeryToken
         public ActionResult Save(Customer customer)
         {
 

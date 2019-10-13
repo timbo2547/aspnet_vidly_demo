@@ -12,41 +12,45 @@
     {
         pageTitlePrefix = "Edit";
     }
+    
+
 
     ViewBag.Title = pageTitlePrefix;
 }
 
 
 @*@{
-    var pageTitlePrefix = string.Empty;
-    if (Model.Customer.Id > 0)
-    {
-        pageTitlePrefix = "Edit";
-    }
-    else
-    {
-        pageTitlePrefix = "New";
-    }
-    ViewBag.Title = pageTitlePrefix;
-}*@
+        var pageTitlePrefix = string.Empty;
+        if (Model.Customer.Id > 0)
+        {
+            pageTitlePrefix = "Edit";
+        }
+        else
+        {
+            pageTitlePrefix = "New";
+        }
+        ViewBag.Title = pageTitlePrefix;
+    }*@
 
 <h2>@pageTitlePrefix Customer</h2>
 
 @using (Html.BeginForm("Save", "Customers"))
 {
+    @Html.ValidationSummary()
     <div class="form-group">
         @Html.LabelFor(x => x.Customer.Name)
         @Html.TextBoxFor(x => x.Customer.Name, new { @class = "form-control" })
         @Html.ValidationMessageFor(x => x.Customer.Name)
     </div>
     <div class="form-group">
-        <label for="Birthdate">Date of Birth</label>
-        @Html.TextBoxFor(x => x.Customer.Birthdate, "{0:d MMM yyyy}", new { @class = "form-control" })
-    </div>
-    <div class="form-group">
         @Html.LabelFor(x => x.Customer.MembershipTypeId)
         @Html.DropDownListFor(x => x.Customer.MembershipTypeId, new SelectList(Model.MembershipTypes, "Id", "MembershipTypeName"), "<Select Membership Type>", new { @class = "form-control" })
         @Html.ValidationMessageFor(x => x.Customer.MembershipTypeId)
+    </div>
+    <div class="form-group">
+        <label for="Birthdate">Date of Birth</label>
+        @Html.TextBoxFor(x => x.Customer.Birthdate, "{0:d MMM yyyy}", new { @class = "form-control" })
+        @Html.ValidationMessageFor(x => x.Customer.Birthdate)
     </div>
     <div class="checkbox">
         <label>
@@ -55,7 +59,16 @@
     </div>
 
     @Html.HiddenFor(m => m.Customer.Id)
-
+    //Creates Token as hidden field in form Prevents CSRF attack
+    //Use in conjuntion with Save Action Attribute 'ValidateAntiForgeryToken'
+    @Html.AntiForgeryToken()
     <button type="submit" class="btn btn-primary">Save</button>
+}
+
+   
+@section scripts
+{
+    @*For jquery validation*@
+    @Scripts.Render("~/bundles/jqueryval")
 }
 
