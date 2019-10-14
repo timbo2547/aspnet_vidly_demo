@@ -25,23 +25,33 @@ namespace Vidly.Controllers.Api
         }
 
         // GET /api/customers/1
-        public CustomerDto GetCustommer(int id)
+        public IHttpActionResult GetCustommer(int id)
         {
             var customer = _context.Customers.SingleOrDefault(x => x.Id == id);
             if (customer == null)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return NotFound();
 
             //Maps Customer to new CustomerDto and returns it
-            return Mapper.Map<Customer, CustomerDto>(customer);
+            return Ok(Mapper.Map<Customer, CustomerDto>(customer));
         }
+        //public CustomerDto GetCustommer(int id)
+        //{
+        //    var customer = _context.Customers.SingleOrDefault(x => x.Id == id);
+        //    if (customer == null)
+        //        throw new HttpResponseException(HttpStatusCode.NotFound);
+
+        //    //Maps Customer to new CustomerDto and returns it
+        //    return Mapper.Map<Customer, CustomerDto>(customer);
+        //}
 
         // POST /api/customers
-        [HttpPost]//Only called if sending HttpPost request. Used for Adding
-        public CustomerDto CreateCustomer(CustomerDto customerDto)
+        //Only called if sending HttpPost request. Used for Adding
+        //Using IHttpActionResult as the return type of actions will align with Restful conventions
+        [HttpPost]
+        public IHttpActionResult CreateCustomer(CustomerDto customerDto)
         {
             if (!ModelState.IsValid)
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
-
+                return BadRequest();
             //Map customerDto to new customer 
             var customer = Mapper.Map<CustomerDto, Customer>(customerDto);
 
@@ -51,8 +61,24 @@ namespace Vidly.Controllers.Api
             //Customer added to Database creates Id
             customerDto.Id = customer.Id;
 
-            return customerDto;
+            return Created(new Uri(Request.RequestUri + "/" + customer.Id), customerDto);
         }
+        //public CustomerDto CreateCustomer(CustomerDto customerDto)
+        //{
+        //    if (!ModelState.IsValid)
+        //        throw new HttpResponseException(HttpStatusCode.BadRequest);
+
+        //    //Map customerDto to new customer 
+        //    var customer = Mapper.Map<CustomerDto, Customer>(customerDto);
+
+        //    _context.Customers.Add(customer);
+        //    _context.SaveChanges();
+
+        //    //Customer added to Database creates Id
+        //    customerDto.Id = customer.Id;
+
+        //    return customerDto;
+        //}
 
         // PUT /api/customers/1
         [HttpPut]//Only called if sending HttpPut request. Used for updating

@@ -11,7 +11,7 @@ namespace Vidly
     {
         public static void Register(HttpConfiguration config)
         {
-            //Enables Camelcasing
+            //Enables Camelcasing in WEB API JSON
             var settings = config.Formatters.JsonFormatter.SerializerSettings;
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             settings.Formatting = Formatting.Indented;
