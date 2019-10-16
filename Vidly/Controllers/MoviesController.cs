@@ -18,6 +18,11 @@ namespace Vidly.Controllers
             _context = new ApplicationDbContext();
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            _context.Dispose();
+        }
+
         // GET: Movies
         public ActionResult Index()
         {
@@ -32,8 +37,8 @@ namespace Vidly.Controllers
             //    Movies = movies
             //};
 
-            var movies = _context.Movies.Include(x => x.Genre).ToList();
-            return View(movies);
+            //var movies = _context.Movies.Include(x => x.Genre).ToList();
+            return View();
         }
 
         public ActionResult Random()

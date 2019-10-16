@@ -23,6 +23,7 @@
 
 <h2>Customers</h2>
 
+@Html.ActionLink("New Customer", "New", "Customers", new { }, new { @class = "btn btn-info" })
 
 <table id="customers" class="table table-bordered table-hover">
     <thead>
@@ -33,42 +34,43 @@
         </tr>
     </thead>
 
-    <tbody>
-        @*@foreach (var customer in Model)
-            {
-                <tr>
-                    <td>@Html.ActionLink(customer.Name, "Edit", "Customers", new { id = customer.Id }, new { })</td>
-                    <td>@customer.MembershipType.MembershipTypeName</td>
-                    <td><button data-customer-id="@customer.Id" class="btn-link js-delete">Delete</button></td>
-                </tr>
-            }*@
-    </tbody>
+    @*<tbody>
+            @foreach (var customer in Model)
+                {
+                    <tr>
+                        <td>@Html.ActionLink(customer.Name, "Edit", "Customers", new { id = customer.Id }, new { })</td>
+                        <td>@customer.MembershipType.MembershipTypeName</td>
+                        <td><button data-customer-id="@customer.Id" class="btn-link js-delete">Delete</button></td>
+                    </tr>
+                }
+        </tbody>*@
 </table>
 
 
 
 @*@if (!Model.Any())
-{
-    <p>There are no Customers :(</p>
+    {
+        <p>There are no Customers :(</p>
 
-}
-else
-{
+    }
+    else
+    {
 
-}*@
+    }*@
 
 @section scripts
 {
     <script>
         //JQuery Script
         $(document).ready(function () {
-            $("#customers").DataTable({
+            var table = $("#customers").DataTable({
                 ajax: {
+                    //This returns the entire list of customers. Will need to break this up server side if records count grows too large
                     url: "/api/customers",
                     dataSrc: ""
-
                 },
                 columns: [
+                    //All 'data' items must be in camelCase
                     {
                         data: "name",
                         //rendering each row in the table
@@ -77,18 +79,18 @@ else
                         }
                     },
                     {
-                        data: "name"
+                        data: "membershipType.membershipTypeName"
                     },
                     {
                         data: "id",
                         render: function (data) {
-                            return "<button class='btn-link js-delete' data-customer-id=" + data + ">Delete</button>"
+                            return "<button data-customer-id=" + data + " class='btn-link js-delete'>Delete</button>"
                         }
                     }
                 ]
             });
 
-            $("#customers").on("click", "js-delete", function () {
+            $("#customers").on("click", ".js-delete", function () {
                 var button = $(this);
                 bootbox.confirm("Are you sure you want to delete this customer?", function (result) {
                     if (result) {
@@ -96,15 +98,11 @@ else
                             url: "/api/customers/" + button.attr("data-customer-id"),
                             method: "DELETE",
                             success: function () {
-                                button.parents("tr").remove();
+                                table.row(button.parents("tr")).remove().draw();
                             }
                         })
                     }
                 })
-
-                //if (confirm("Are you sure you want to delete this customer?")) {
-
-                //}
             })
         })
     </script>
