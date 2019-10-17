@@ -7,8 +7,15 @@ namespace Vidly
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
+            //Redirects user to error page when action throws exception
             filters.Add(new HandleErrorAttribute());
+
+            //Applies Authorized Filter to all
             filters.Add(new AuthorizeAttribute());
+
+            filters.Add(new RequireHttpsAttribute());
+
+
         }
     }
 }
