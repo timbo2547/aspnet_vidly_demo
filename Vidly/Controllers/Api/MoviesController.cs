@@ -21,14 +21,37 @@ namespace Vidly.Controllers.Api
         }
 
         [Authorize(Roles = RoleName.CanManageMovies)]
-        public IEnumerable<MovieDto> GetMovies()
-        {
-            //Maps Customer to CustomerDto with delegate method reference
-            return _context.Movies
-                .Include(x => x.Genre)
+        public IHttpActionResult GetMovies(string query = null)
+        {       
+            var moviesQuery = _context.Movies
+                .Include(x => x.Genre);
+
+            if (!String.IsNullOrWhiteSpace(query))
+                moviesQuery = moviesQuery.Where(x => x.Name.Contains(query));
+
+            var movieDtos = moviesQuery
                 .ToList()
                 .Select(Mapper.Map<Movie, MovieDto>);
+
+            return Ok(movieDtos);
         }
+
+        //public IHttpActionResult GetCustomers(string query = null)
+        //{
+        //    
+        //    var customersQuery = _context.Customers
+        //            .Include(x => x.MembershipType);
+
+        //    if (!String.IsNullOrWhiteSpace(query))
+        //        customersQuery = customersQuery.Where(c => c.Name.Contains(query));
+
+        //    var customerDtos = customersQuery
+        //        .ToList()
+        //        .Select(Mapper.Map<Customer, Customer>);
+
+        //    return Ok(customerDtos);
+        //}
+
 
         ////GET /api/movies
         //public IHttpActionResult GetMovies()
