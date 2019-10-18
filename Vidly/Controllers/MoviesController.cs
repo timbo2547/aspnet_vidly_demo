@@ -23,6 +23,7 @@ namespace Vidly.Controllers
             _context.Dispose();
         }
 
+        [Authorize(Roles = RoleName.CanManageMovies)]
         // GET: Movies
         public ActionResult Index()
         {
@@ -46,6 +47,7 @@ namespace Vidly.Controllers
             return View("ReadOnlyList");
         }
 
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Random()
         {
             Movie movie = new Movie() { Id = 1, Name = "Shrek" };
@@ -67,6 +69,7 @@ namespace Vidly.Controllers
         }
 
         [Route("movies/details/{id}")]
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Details(int id)
         {
             //List<Movie> movies = new List<Movie>
@@ -90,6 +93,7 @@ namespace Vidly.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]//Used in conjunction with View Helper method AntiForgeryToken
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Save(Movie movie)
         {
             if (!ModelState.IsValid)
@@ -126,6 +130,7 @@ namespace Vidly.Controllers
             return RedirectToAction("Index", "Movies");
         }
 
+        [Authorize(Roles = RoleName.CanManageMovies)]
         public ActionResult Edit(int id)
         {
             var movie = _context.Movies.SingleOrDefault(x => x.Id == id);

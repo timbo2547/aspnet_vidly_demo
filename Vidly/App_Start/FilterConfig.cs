@@ -13,9 +13,8 @@ namespace Vidly
             //Applies Authorized Filter to all
             filters.Add(new AuthorizeAttribute());
 
+            //HTTPS enables TLS
             filters.Add(new RequireHttpsAttribute());
-
-
         }
     }
 }
