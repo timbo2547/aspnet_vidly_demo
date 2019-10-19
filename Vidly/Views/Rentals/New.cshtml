@@ -5,25 +5,43 @@
 
 <h2>New Rental Form</h2>
 
-<form>
+<form id="newRental">
     <div class="form-group">
         <label>Customer</label>
-        <input id="customer" type="text" value="" class="form-control" />
+        <div class="tt-container">
+            <!--JQuery understands 'required' attribute in input for validation-->
+            <!--name attribute is required for validation-->
+            <input id="customer" name="customer" data-rule-validcustomer="true" required type="text" value="" class="form-control" />
+        </div>
     </div>
 
     <div class="form-group">
         <label>Movie</label>
-        <input type="text" value="" class="form-control" />
+        <div class="tt-container">
+            <input id="movie" name="movie" data-rule-atLeastOneMovie="true" type="text" value="" class="form-control" />
+        </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-4 col-sm-4">
+            <ul id="movies" class="list-group"></ul>
+        </div>
+    </div>
+
+
     <button class="btn btn-primary">Submit</button>
 </form>
 
 @section scripts
-{
+{  
+    @Scripts.Render("~/bundles/jqueryval")
     <script>
         $(document).ready(function () {
+            //typeahead for customers input
             //ViewModel
-            var vm = {};
+            var vm = {
+                movieIds: []
+            };
             var customers = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -43,10 +61,78 @@
             }).on("typeahead:select", function (e, customer) {
                 vm.customerId = customer.id;
             });
-        })
 
+
+            //typeahead for movies input
+            var vmM = {};
+            var movies = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/api/movies?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('#movie').typeahead({
+                minLength: 2,
+                highlight: true
+            }, {
+                name: 'movies',
+                display: 'name',
+                source: movies
+            }).on("typeahead:select", function (e, movie) {
+                //Lookup Vue
+                $('#movies').append("<li class='list-group-item'>" + movie.name + "</li>");
+                $('#movie').typeahead("val", "");
+                vm.movieIds.push(movie.id);
+            });
+
+            //Custom Validation, validCustomer is referenced above in the customer input
+            $.validator.addMethod("validCustomer", function () {
+                return vm.customerId && vm.customerId !== 0;
+            }, 'Please select a valid customer.')
+
+            //Movie Validation, atLeastOneMovie is referenced above in the movie input
+            $.validator.addMethod("atLeastOneMovie", function () {
+                return vm.movieIds.length > 0;
+            }, 'Please select at least one movie.')
+
+            //If form is validated
+            var validator = $('#newRental').validate({
+                submitHandler: function () {
+                    //Posts new rental via NewRental Api
+                    $.ajax({
+                        url: "/api/newrentals", //api url
+                        method: "POST", //get, post, put, delete
+                        data: vm //viewModel with data to be returned to api
+                    })
+                    .done(function () { //on success
+                        toastr.success('Rentals successfully recorded.')
+                        $('#customer').typeahead('val', "");
+                        $('#movie').typeahead('val', "");
+                        $('#movies').empty();
+
+                        //Resets viewModel after success
+                        vm = { movieIds: [] };
+                        //Resets Validation after success
+                        validator.resetForm();
+                    })
+                    .fail(function () { //on failure
+                        toastr.error('Something unexpected happened.')
+                    })
+                    //Prevents default form from being returned
+                    return false;
+                }
+            });
+            //Submits form
+            //$('#newRental').submit(function (e) {
+                //Prevents default form from being returned
+                //e.preventDefault();
+            //})
+        })
     </script>
-    
-    
-    
-    }
+
+
+
+}

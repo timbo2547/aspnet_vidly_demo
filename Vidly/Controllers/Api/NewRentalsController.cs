@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -53,8 +54,17 @@ namespace Vidly.Controllers.Api
                 };
                 _context.Rentals.Add(rental);
             }
-
             _context.SaveChanges();
+            //try
+            //{
+              
+            //}
+            //catch (DbEntityValidationException e)
+            //{
+
+            //}
+
+          
 
             return Ok();
 

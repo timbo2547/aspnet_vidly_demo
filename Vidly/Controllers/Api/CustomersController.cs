@@ -22,6 +22,7 @@ namespace Vidly.Controllers.Api
         public IHttpActionResult GetCustomers(string query = null)
         {
             //Maps Customer to CustomerDto with delegate method reference
+            //Leave as IQueryable to perform query on this
             var customersQuery = _context.Customers
                     .Include(x => x.MembershipType);
 

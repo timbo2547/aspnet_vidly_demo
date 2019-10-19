@@ -24,7 +24,7 @@ namespace Vidly.Models
         public int NumberInStock { get; set; }
 
         [Display(Name = "Number Available")]
-        [Range(1, 20)]
+        [Range(0, 20)]
         public int NumberAvailable { get; set; }
 
         public Genre Genre { get; set; }
